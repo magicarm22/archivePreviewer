@@ -3,7 +3,5 @@ import os
 
 class Config:
     DEBUG = False
-    CSRF_ENABLED = True
-    SECRET_KEY = 'YOUR_RANDOM_SECRET_KEY'
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///archivePreviewer.db'  # os.environ['DATABASE_URL']
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
