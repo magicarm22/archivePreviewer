@@ -9,7 +9,18 @@ from app.models import ZipFileInfo, AnalyzeInfo
 
 @app.route('/', methods=['GET'])
 def getCheckedFiles():
-    return 'HELLO!'
+    results = db.session.query(AnalyzeInfo, ZipFileInfo).join(ZipFileInfo).all()
+    answer = {'status': 'SUCCESS', 'response': []}
+    files = {}
+    for file_info, zip_file_info in results:
+        if zip_file_info.id not in files:
+            files[zip_file_info.id] = {'file': zip_file_info.filename, 'content': [{'path': file_info.filename, 'size': file_info.file_size}]}
+        else:
+            files[zip_file_info.id]['content'].append({'path': file_info.filename, 'size': file_info.file_size})
+
+    for key, value in files.items():
+        answer['response'].append({**{'id': key}, **value})
+    return answer
     pass
 
 
