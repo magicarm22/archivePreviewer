@@ -3,7 +3,8 @@ import zipfile
 
 from flask import request
 
-from app import app
+from app import app, db
+from app.models import ZipFileInfo, AnalyzeInfo
 
 
 @app.route('/', methods=['GET'])
@@ -12,13 +13,9 @@ def getCheckedFiles():
     pass
 
 
-def getInfoAboutFile(file):
-    sended_zip_file = zipfile.ZipFile(file)
-    result = {'status': 'SUCCESS', 'response': {'file': file.filename, 'content': []}}
-    for filename in sended_zip_file.namelist():
-        file_info = sended_zip_file.getinfo(filename)
-        result['response']['content'].append({'path': filename, 'size': int(file_info.file_size)})
-    return result
+def getInfoAboutFile(zip_file, filename):
+    file_info = zip_file.getinfo(filename)
+    return {'path': filename, 'size': int(file_info.file_size)}
 
 
 @app.route('/', methods=['POST'])
@@ -28,5 +25,16 @@ def postZIP():
     file = request.files['file']
     if file.filename.rsplit('.', 1)[1] != 'zip':
         return {'status': 'ERROR', 'description': "It's not a .ZIP file"}
-    result = getInfoAboutFile(file)
-    return result
+    zip_file = ZipFileInfo(filename=file.filename)
+    db.session.add(zip_file)
+    db.session.flush()
+    db.session.refresh(zip_file)
+    sended_zip_file = zipfile.ZipFile(file)
+    answer = {'status': 'SUCCESS', 'response': {'file': file.filename, 'content': []}}
+    for filename in sended_zip_file.namelist():
+        result = getInfoAboutFile(sended_zip_file, filename)
+        info_file = AnalyzeInfo(zip_file_id=zip_file.id, filename=result['path'], file_size=result['size'])
+        db.session.add(info_file)
+        answer['response']['content'].append(result)
+    db.session.commit()
+    return answer
