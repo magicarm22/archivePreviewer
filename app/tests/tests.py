@@ -55,9 +55,9 @@ def test_add_zip_without_files(app: Flask) -> None:
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
     assert {'response': {
-                'content': [],
-                'file': 'empty.zip'
-            }, 'status': 'SUCCESS'} == json.loads(res.data.decode())
+        'content': [],
+        'file': 'empty.zip'
+    }, 'status': 'SUCCESS'} == json.loads(res.data.decode())
 
 
 def test_add_zip_with_big_files(app: Flask) -> None:
@@ -95,11 +95,11 @@ def test_add_zip_with_folders(app: Flask) -> None:
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
     assert {'response': {'content': [
-            {'path': 'Nexus/folder1/flash-all.sh', 'size': 750},
-            {'path': 'Nexus/folder1/flash-base.sh', 'size': 705},
-            {'path': 'Nexus/folder2/flash-all.bat', 'size': 862},
-            {'path': 'Nexus/folder2/folder3/bootloader-flounder-3.48.0.0135.img', 'size': 2968354}],
-         'file': 'zipWithFolders.zip'}, 'status': 'SUCCESS'} == json.loads(res.data.decode())
+        {'path': 'Nexus/folder1/flash-all.sh', 'size': 750},
+        {'path': 'Nexus/folder1/flash-base.sh', 'size': 705},
+        {'path': 'Nexus/folder2/flash-all.bat', 'size': 862},
+        {'path': 'Nexus/folder2/folder3/bootloader-flounder-3.48.0.0135.img', 'size': 2968354}],
+        'file': 'zipWithFolders.zip'}, 'status': 'SUCCESS'} == json.loads(res.data.decode())
 
 
 def test_get_info_function() -> None:
@@ -111,3 +111,20 @@ def test_get_info_function() -> None:
     with zipfile.ZipFile(os.path.join(current_directory, 'files\\oneFile.zip')) as zip_object:
         res = get_info_about_file(zip_object, 'dotnetfx.exe')
     assert res == {'path': 'dotnetfx.exe', 'size': 21823560}
+
+
+def test_send_corrupted_file(app: Flask) -> None:
+    """
+    Function is testing sending corrupted zip file.
+    :param app: Flask testing application
+    :type app: Flask
+    """
+    client = app.test_client()
+    path_to_current_file = os.path.realpath(__file__)
+    current_directory = os.path.split(path_to_current_file)[0]
+    with open(os.path.join(current_directory, 'files\\corrupted.zip'), 'rb') as file:
+        data = {'file': (io.BytesIO(file.read()), 'corrupted.zip')}
+    res = client.post('/', content_type='multipart/form-data', data=data)
+    assert res.status == '200 OK'
+    assert {"description": "Corrupted zip file",
+            "status": "SUCCESS"} == json.loads(res.data.decode())

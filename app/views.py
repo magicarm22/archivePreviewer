@@ -79,14 +79,18 @@ def post_zip() -> Union[collections.defaultdict, dict, list]:
     db.session.add(zip_file)
     db.session.flush()
     db.session.refresh(zip_file)
-    answer = {'status': 'SUCCESS', 'response': {'file': file.filename, 'content': []}}
-    with zipfile.ZipFile(io.BytesIO(file.read())) as sended_zip_file:
-        for filename in [x for x in sended_zip_file.namelist() if not x.endswith('/')]:
-            result = get_info_about_file(sended_zip_file, filename)
-            info_file = AnalyzeInfo(zip_file_id=zip_file.id,
-                                    filename=result['path'],
-                                    file_size=result['size'])
-            db.session.add(info_file)
-            answer['response']['content'].append(result)
-    db.session.commit()
+    try:
+        answer = {'status': 'SUCCESS', 'response': {'file': file.filename, 'content': []}}
+        with zipfile.ZipFile(io.BytesIO(file.read())) as sended_zip_file:
+            for filename in [x for x in sended_zip_file.namelist() if not x.endswith('/')]:
+                result = get_info_about_file(sended_zip_file, filename)
+                info_file = AnalyzeInfo(zip_file_id=zip_file.id,
+                                        filename=result['path'],
+                                        file_size=result['size'])
+                db.session.add(info_file)
+                answer['response']['content'].append(result)
+        db.session.commit()
+    except zipfile.BadZipFile:
+        db.session.flush()
+        return {'status': 'SUCCESS', 'description': 'Corrupted zip file'}
     return answer
