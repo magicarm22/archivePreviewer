@@ -5,7 +5,7 @@ File initialize database, is importing views and modules.
 from flask import Flask
 from app import views
 from app import models
-from app.database import db
+from app.database import db, init_db
 
 
 def create_app(config_name: str) -> Flask:
@@ -21,6 +21,7 @@ def create_app(config_name: str) -> Flask:
     app.config.from_object(config_name)
 
     db.init_app(app)
+    init_db(app)
 
     app.register_blueprint(views.app)
 
