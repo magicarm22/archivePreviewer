@@ -1,11 +1,14 @@
 import fileinput
+import io
 import zipfile
 
-from flask import request
+from flask import request, Blueprint
 
-from app import app, db
+from app import db
 from app.models import ZipFileInfo, AnalyzeInfo
 
+
+app = Blueprint('archivePreviewer', __name__)
 
 @app.route('/', methods=['GET'])
 def getCheckedFiles():
@@ -21,7 +24,6 @@ def getCheckedFiles():
     for key, value in files.items():
         answer['response'].append({**{'id': key}, **value})
     return answer
-    pass
 
 
 def getInfoAboutFile(zip_file, filename):
@@ -40,9 +42,9 @@ def postZIP():
     db.session.add(zip_file)
     db.session.flush()
     db.session.refresh(zip_file)
-    sended_zip_file = zipfile.ZipFile(file)
+    sended_zip_file = zipfile.ZipFile(io.BytesIO(file.read()))
     answer = {'status': 'SUCCESS', 'response': {'file': file.filename, 'content': []}}
-    for filename in sended_zip_file.namelist():
+    for filename in [x for x in sended_zip_file.namelist() if not x.endswith('/')]:
         result = getInfoAboutFile(sended_zip_file, filename)
         info_file = AnalyzeInfo(zip_file_id=zip_file.id, filename=result['path'], file_size=result['size'])
         db.session.add(info_file)
