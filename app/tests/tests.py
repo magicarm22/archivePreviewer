@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import zipfile
 
 import pytest
@@ -26,7 +27,9 @@ def test_empty_db(app):
 
 def test_add_zip_without_files(app):
     client = app.test_client()
-    with open('files\\empty.zip', 'rb') as f:
+    path_to_current_file = os.path.realpath(__file__)
+    current_directory = os.path.split(path_to_current_file)[0]
+    with open(os.path.join(current_directory, 'files\\empty.zip'), 'rb') as f:
         data = {'file': (io.BytesIO(f.read()), 'empty.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert '200 OK' == res.status
@@ -35,7 +38,9 @@ def test_add_zip_without_files(app):
 
 def test_add_zip_with_big_files(app):
     client = app.test_client()
-    with open('files\\someBigFiles.zip', 'rb') as f:
+    path_to_current_file = os.path.realpath(__file__)
+    current_directory = os.path.split(path_to_current_file)[0]
+    with open(os.path.join(current_directory, 'files\\someBigFiles.zip'), 'rb') as f:
         data = {'file': (io.BytesIO(f.read()), 'someBigFiles.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert '200 OK' == res.status
@@ -48,7 +53,9 @@ def test_add_zip_with_big_files(app):
 
 def test_add_zip_with_folders(app):
     client = app.test_client()
-    with open('files\\zipWithFolders.zip', 'rb') as f:
+    path_to_current_file = os.path.realpath(__file__)
+    current_directory = os.path.split(path_to_current_file)[0]
+    with open(os.path.join(current_directory, 'files\\zipWithFolders.zip'), 'rb') as f:
         data = {'file': (io.BytesIO(f.read()), 'zipWithFolders.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert '200 OK' == res.status
@@ -61,7 +68,9 @@ def test_add_zip_with_folders(app):
 
 
 def test_get_info_function():
-    with open('files\\oneFile.zip', 'rb') as f:
+    path_to_current_file = os.path.realpath(__file__)
+    current_directory = os.path.split(path_to_current_file)[0]
+    with open(os.path.join(current_directory, 'files\\oneFile.zip'), 'rb') as f:
         zip = zipfile.ZipFile(io.BytesIO(f.read()))
         res = getInfoAboutFile(zip, 'dotnetfx.exe')
         assert res == {'path': 'dotnetfx.exe', 'size': 21823560}
