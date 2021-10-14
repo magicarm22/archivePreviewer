@@ -10,7 +10,8 @@ import zipfile
 import pytest
 from flask import Flask
 
-from app import create_app, db
+from app.database import db
+from app import create_app
 from app.views import get_info_about_file
 
 

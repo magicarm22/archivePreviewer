@@ -10,7 +10,7 @@ from typing import Union
 
 from flask import request, Blueprint
 
-from app import db
+from app.database import db
 from app.models import ZipFileInfo, AnalyzeInfo
 
 app = Blueprint('archivePreviewer', __name__)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """File models.py contains the descriptions of all tables in the SQLite database"""
 
-from app import db
+from app.database import db
 
 
 class ZipFileInfo(db.Model):  # pylint: disable=too-few-public-methods

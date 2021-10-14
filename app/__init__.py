@@ -3,13 +3,9 @@ File initialize database, is importing views and modules.
 """
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
-# pylint: disable=wrong-import-position
 from app import views
 from app import models
+from app.database import db
 
 
 def create_app(config_name: str) -> Flask:
