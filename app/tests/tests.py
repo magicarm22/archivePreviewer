@@ -4,8 +4,8 @@ File with all tests for the archivePreviewer project
 
 import io
 import json
-import os
 import zipfile
+from pathlib import Path
 
 import pytest
 from flask import Flask
@@ -48,9 +48,8 @@ def test_add_zip_without_files(app: Flask) -> None:
     :type app: Flask
     """
     client = app.test_client()
-    path_to_current_file = os.path.realpath(__file__)
-    current_directory = os.path.split(path_to_current_file)[0]
-    with open(os.path.join(current_directory, 'files\\empty.zip'), 'rb') as file:
+    current_directory = Path.cwd()
+    with open(current_directory / 'app' / 'tests' / 'files' / 'empty.zip', 'rb') as file:
         data = {'file': (io.BytesIO(file.read()), 'empty.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
@@ -67,9 +66,8 @@ def test_add_zip_with_big_files(app: Flask) -> None:
     :type app: Flask
     """
     client = app.test_client()
-    path_to_current_file = os.path.realpath(__file__)
-    current_directory = os.path.split(path_to_current_file)[0]
-    with open(os.path.join(current_directory, 'files\\someBigFiles.zip'), 'rb') as file:
+    current_directory = Path.cwd()
+    with open(current_directory / 'app' / 'tests' / 'files' / 'someBigFiles.zip', 'rb') as file:
         data = {'file': (io.BytesIO(file.read()), 'someBigFiles.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
@@ -88,9 +86,8 @@ def test_add_zip_with_folders(app: Flask) -> None:
     :type app: Flask
     """
     client = app.test_client()
-    path_to_current_file = os.path.realpath(__file__)
-    current_directory = os.path.split(path_to_current_file)[0]
-    with open(os.path.join(current_directory, 'files\\zipWithFolders.zip'), 'rb') as file:
+    current_directory = Path.cwd()
+    with open(current_directory / 'app' / 'tests' / 'files' / 'zipWithFolders.zip', 'rb') as file:
         data = {'file': (io.BytesIO(file.read()), 'zipWithFolders.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
@@ -106,9 +103,9 @@ def test_get_info_function() -> None:
     """
     Function is testing get_info_about_file function and check the result.
     """
-    path_to_current_file = os.path.realpath(__file__)
-    current_directory = os.path.split(path_to_current_file)[0]
-    with zipfile.ZipFile(os.path.join(current_directory, 'files\\oneFile.zip')) as zip_object:
+    current_directory = Path.cwd()
+    with zipfile.ZipFile(
+            current_directory / 'app' / 'tests' / 'files' / 'oneFile.zip') as zip_object:
         res = get_info_about_file(zip_object, 'dotnetfx.exe')
     assert res == {'path': 'dotnetfx.exe', 'size': 21823560}
 
@@ -120,9 +117,8 @@ def test_send_corrupted_file(app: Flask) -> None:
     :type app: Flask
     """
     client = app.test_client()
-    path_to_current_file = os.path.realpath(__file__)
-    current_directory = os.path.split(path_to_current_file)[0]
-    with open(os.path.join(current_directory, 'files\\corrupted.zip'), 'rb') as file:
+    current_directory = Path.cwd()
+    with open(current_directory / 'app' / 'tests' / 'files' / 'corrupted.zip', 'rb') as file:
         data = {'file': (io.BytesIO(file.read()), 'corrupted.zip')}
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
