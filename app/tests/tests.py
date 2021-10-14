@@ -1,21 +1,16 @@
 import io
 import json
-import os
-import tempfile
 import zipfile
 
 import pytest
-from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app, db
-from app import models
 from app.views import getInfoAboutFile
 
 
 @pytest.fixture
 def app():
     app = create_app("app.config.TestingConfig")
-    from app import models
     with app.app_context():
         db.drop_all()
         db.create_all()

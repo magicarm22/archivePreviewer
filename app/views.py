@@ -1,4 +1,3 @@
-import fileinput
 import io
 import zipfile
 
@@ -7,8 +6,8 @@ from flask import request, Blueprint
 from app import db
 from app.models import ZipFileInfo, AnalyzeInfo
 
-
 app = Blueprint('archivePreviewer', __name__)
+
 
 @app.route('/', methods=['GET'])
 def getCheckedFiles():
@@ -17,7 +16,8 @@ def getCheckedFiles():
     files = {}
     for file_info, zip_file_info in results:
         if zip_file_info.id not in files:
-            files[zip_file_info.id] = {'file': zip_file_info.filename, 'content': [{'path': file_info.filename, 'size': file_info.file_size}]}
+            files[zip_file_info.id] = {'file': zip_file_info.filename,
+                                       'content': [{'path': file_info.filename, 'size': file_info.file_size}]}
         else:
             files[zip_file_info.id]['content'].append({'path': file_info.filename, 'size': file_info.file_size})
 
