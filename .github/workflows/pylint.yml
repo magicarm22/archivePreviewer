@@ -18,6 +18,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
         pip install -r requirements.txt
+        pip install pylint_flask
+        pip install pylint_flask_sqlalchemy
     - name: Analysing the code with pylint
       run: |
-        pylint $(find . -name "*.py" | xargs)
+        pylint --rcfile=pylintrc --load-plugins pylint_flask,pylint_flask_sqlalchemy $(find . -name "*.py" | xargs)
