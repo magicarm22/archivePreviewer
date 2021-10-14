@@ -22,4 +22,4 @@ jobs:
         pip install pylint_flask_sqlalchemy
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=pylintrc --load-plugins pylint_flask,pylint_flask_sqlalchemy $(find . -name "*.py" | xargs)
+        pylint --rcfile=.pylintrc --load-plugins pylint_flask,pylint_flask_sqlalchemy $(find . -name "*.py" | xargs)
