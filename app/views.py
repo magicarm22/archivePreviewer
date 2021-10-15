@@ -92,5 +92,5 @@ def post_zip() -> Union[collections.defaultdict, dict, list]:
         db.session.commit()
     except zipfile.BadZipFile:
         db.session.flush()
-        return {'status': 'SUCCESS', 'description': 'Corrupted zip file'}
+        return {'status': 'ERROR', 'description': 'Corrupted zip file'}
     return answer

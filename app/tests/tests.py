@@ -123,4 +123,4 @@ def test_send_corrupted_file(app: Flask) -> None:
     res = client.post('/', content_type='multipart/form-data', data=data)
     assert res.status == '200 OK'
     assert {"description": "Corrupted zip file",
-            "status": "SUCCESS"} == json.loads(res.data.decode())
+            "status": "ERROR"} == json.loads(res.data.decode())
